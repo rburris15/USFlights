@@ -1,0 +1,67 @@
+---------------------------
+-- CREATE STAGE
+--    1  Load Data with types
+---------------------------
+
+--set role, warehouse, db, schema
+USE ROLE CANDIDATE_00342;
+USE WAREHOUSE WH_CANDIDATE_00342;
+USE DATABASE RECRUITMENT_DB;
+USE SCHEMA CANDIDATE_00342;
+
+
+--make the table with data types where possible
+CREATE OR REPLACE TABLE "STG_FLIGHTS" (
+  "TRANSACTIONID"       BIGINT,
+  "FLIGHTDATE"          DATE,            
+  "AIRLINECODE"         VARCHAR(3),
+  "AIRLINENAME"         VARCHAR(100),  
+  "TAILNUM"             VARCHAR(7),
+  "FLIGHTNUM"           VARCHAR(4),
+  "ORIGINAIRPORTCODE"   VARCHAR(3),
+  "ORIGAIRPORTNAME"     VARCHAR(100),
+  "ORIGINCITYNAME"      VARCHAR(50),
+  "ORIGINSTATE"         VARCHAR(2),
+  "ORIGINSTATENAME"     VARCHAR(50),
+  "DESTAIRPORTCODE"     VARCHAR(3),
+  "DESTAIRPORTNAME"     VARCHAR(100),
+  "DESTCITYNAME"        VARCHAR(50),
+  "DESTSTATE"           VARCHAR(2),
+  "DESTSTATENAME"       VARCHAR(50),
+  "CRSDEPTIME"          VARCHAR(10),
+  "DEPTIME"             VARCHAR(10),
+  "DEPDELAY"            SMALLINT,
+  "TAXIOUT"             SMALLINT,
+  "WHEELSOFF"           VARCHAR(10),
+  "WHEELSON"            VARCHAR(10),
+  "TAXIIN"              SMALLINT,
+  "CRSARRTIME"          VARCHAR(10),
+  "ARRTIME"             VARCHAR(10),
+  "ARRDELAY"            SMALLINT,
+  "CRSELAPSEDTIME"      SMALLINT,
+  "ACTUALELAPSEDTIME"   SMALLINT,
+  "CANCELLED"           BOOLEAN,
+  "DIVERTED"            BOOLEAN,
+  "DISTANCE"            VARCHAR
+);
+
+--copy data
+COPY INTO STG_FLIGHTS
+FROM @RECRUITMENT_DB.PUBLIC.S3_FOLDER
+FILE_FORMAT = FLIGHTS_FF
+ON_ERROR = continue;
+
+-- Check copy matches orginal
+SELECT COUNT(*) AS ROWCOUNT FROM "STG_FLIGHTS"  --my copy
+EXCEPT
+SELECT COUNT(*) AS FILE_ROWCOUNT
+FROM @RECRUITMENT_DB.PUBLIC.S3_FOLDER (FILE_FORMAT => FLIGHTS_FF); -- orig
+
+-- A quick sample
+SELECT * 
+FROM "STG_FLIGHTS"
+LIMIT 10;
+
+
+
+
