@@ -1,0 +1,10 @@
+# Code & web assets
+*.sql text eol=lf
+*.py  text eol=lf
+*.md  text eol=lf
+*.svg text eol=lf
+
+# Data files
+*.csv text eol=lf
+*.tsv text eol=lf
+*.txt text eol=lf
